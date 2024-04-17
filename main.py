@@ -14,6 +14,14 @@ saldo = 0.00
 extrato = []
 
 
+"""
+Função para atualizar variável saldo (+).
+Parâmetros:
+- valor(float): valor a ser somado com saldo.
+    * precisa ser maior que 0.
+Retorna:
+- True se a atualização for possível e False caso contrário.
+"""
 def depositar_valor(valor):
     global saldo
     if(valor<=0):
@@ -27,7 +35,16 @@ def depositar_valor(valor):
         return True
     
 
+"""
+Função para atualizar variável saldo (-).
+Parâmetros:
+- valor(float): valor a ser subtraído do saldo ().
+    * precisa ser maior que 0, menor ou igual a saldo e menor que LIMITE_VALOR_SAQUE (definida manualmente).
+Retorna:
+- True se a atualização for possível e False caso contrário.
+"""
 def sacar_valor(valor):
+
     global saldo, quantidade_saques_restantes
     if(valor>LIMITE_VALOR_SAQUE):
         print(f'Valor informado R${valor:.2f} ultrapassa o limite de saque R${LIMITE_VALOR_SAQUE:.2f}')
@@ -48,7 +65,17 @@ def sacar_valor(valor):
         return True
 
 
+"""
+Função para mostrar os items da variável extrato (depósitos e saques realizados)
+
+Parâmetros:
+- N/A
+
+Retorna:
+- N/A
+"""
 def mostrar_extrato():
+# Verifica se o extrato está vazio.
     if not extrato:
         print(
 '''=-=-=-=-=-=-=-=-=-=Extrato-=-=-==-=-=-=-=-=-=
@@ -61,6 +88,7 @@ f'''=-=-=-=-=-=-=-=-=-=Extrato-=-=-==-=-=-=-=-=-=
     Seu saldo atual é: R${saldo:.2f}
     OPERAÇÃO   |    VALOR
     ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾''')
+        # Muda a quantidade de espaços dependendo da quantidade de char de uma palavra, para o print ficar alinhado
         for item in extrato:
             if(item['Tipo de operação'] == 'Saque'):
                 quantidade_espacos_print = 6
@@ -72,6 +100,15 @@ f'''=-=-=-=-=-=-=-=-=-=Extrato-=-=-==-=-=-=-=-=-=
         input('Aperte "enter" para continuar. ')
 
 
+"""
+Função para mostrar em loop as opções do menu inicial
+
+Parâmetros:
+- N/A
+
+Retorna:
+- N/A
+"""
 def menu_inicial():
     while True:
         try:        
@@ -84,6 +121,7 @@ def menu_inicial():
     [0] - Sair
 ========================================================
 Opção: '''))
+            # Verifica a opção escolhida
             match opcao_escolhida:
                 case 0:
                     print("Obrigado por usar o Banco GabIke 😊 até a próxima!")
