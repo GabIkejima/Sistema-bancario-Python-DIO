@@ -7,6 +7,14 @@ Sistema de controle bancário simples desenvolvido em Python para o bootcamp [Py
 ## Sobre
 O sistema permite realizar operações básicas como depósito, saque, consulta de extrato, cadastro de usuários e criação de contas bancárias.
 
+<table>
+  <tr>
+    <td><img src="https://github.com/GabIkejima/sistema-bancario-python-dio/blob/main/assets/extrato.png" alt="Imagem extrato" style="width: 300 height : 200;"/></td>
+    <td><img src="https://github.com/GabIkejima/sistema-bancario-python-dio/blob/main/assets/menu_inicial.png" alt="Imagem menu inicial" style="width: 300 height : 200;"/></td>
+    <td><img src="https://github.com/GabIkejima/sistema-bancario-python-dio/blob/main/assets/saque.png" alt="Imagem saque" style="width: 300 height : 200;"/></td>
+  </tr>
+</table>
+
 ### Funcionalidades 🛠
 | Funcionalidade   | Descrição                                   |
 | :---------- |:------------------------------------------ |
