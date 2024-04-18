@@ -6,6 +6,7 @@ Gabriel Higa Ikejima
 @since
 17 / 04 / 2024
 """
+from time import gmtime, strftime
 
 LIMITE_QUANTIDADE_SAQUE_DIARIO = 3
 LIMITE_VALOR_SAQUE = 500.00
@@ -14,16 +15,26 @@ saldo = 0.00
 extrato = []
 
 
+def set_saldo(saldo_atualizado):
+    global saldo
+    saldo = saldo_atualizado
+
+def set_qntde_saques_restantes(qntde_saques_restantes):
+    global quantidade_saques_restantes
+    quantidade_saques_restantes = qntde_saques_restantes
+
 """
 Função para atualizar variável saldo (+).
 Parâmetros:
 - valor(float): valor a ser somado com saldo.
     * precisa ser maior que 0.
+- saldo(float): saldo atual da conta.
 Retorna:
 - True se a atualização for possível e False caso contrário.
+Outros:
+- Função chama set_saldo para atualizar variável sem usar scope global.
 """
-def depositar_valor(valor):
-    global saldo
+def depositar_valor(saldo,valor,/):
     if(valor<=0):
         print(f"Valor informado R${valor} é inválido! Forneça um valor maior que zero.")
         return False
@@ -31,7 +42,12 @@ def depositar_valor(valor):
         saldo += valor
         print(f"Valor depositado com sucesso!(R${valor:.2f}).")
         print(f"Novo saldo: R${saldo:.2f}")
-        extrato.append({'Tipo de operação': 'Depósito', 'Valor': valor}) 
+
+        timestamp = strftime("%d-%m-%Y %H:%M:%S", gmtime()) # Horário atual para adicionar no extrato
+        extrato.append({'Tipo de operação': 'Depósito', 'Valor': valor, 'Horário' : timestamp}) 
+
+        # Atualizando saldo
+        set_saldo(saldo)
         return True
     
 
@@ -40,12 +56,15 @@ Função para atualizar variável saldo (-).
 Parâmetros:
 - valor(float): valor a ser subtraído do saldo ().
     * precisa ser maior que 0, menor ou igual a saldo e menor que LIMITE_VALOR_SAQUE (definida manualmente).
+- saldo(float): valor de saldo atual.
+- quantidade_saques_restantes(int): quantidade de saques diários restantes do usuário
+    * precisa ser maior que 0
 Retorna:
 - True se a atualização for possível e False caso contrário.
+Outros:
+- Função chama set_qntde_saques_restantes e set_saldo para atualizar variáveis sem usar scope global.
 """
-def sacar_valor(valor):
-
-    global saldo, quantidade_saques_restantes
+def sacar_valor(*,saldo,valor,quantidade_saques_restantes):
     if(valor>LIMITE_VALOR_SAQUE):
         print(f'Valor informado R${valor:.2f} ultrapassa o limite de saque R${LIMITE_VALOR_SAQUE:.2f}')
         return False
@@ -57,11 +76,17 @@ def sacar_valor(valor):
         return False
     else:
         saldo -= valor
-        print(f"Valor sacado com sucesso!(R${valor:.2f}).")
-        print(f"Novo saldo: R${saldo:.2f}")
         quantidade_saques_restantes -= 1
-        extrato.append({'Tipo de operação': 'Saque', 'Valor': valor}) 
+        print(f"Valor sacado com sucesso!(R${valor:.2f}).")
+        print(f"Novo saldo: R${saldo:.2f}") 
         print(f'Quantidade de saques restantes:{quantidade_saques_restantes}/{LIMITE_QUANTIDADE_SAQUE_DIARIO}')
+
+        timestamp = strftime("%d-%m-%Y %H:%M:%S", gmtime()) # Horário atual para adicionar no extrato
+        extrato.append({'Tipo de operação': 'Saque', 'Valor': valor, 'Horário' : timestamp}) 
+        
+        # Atualizando variáveis
+        set_qntde_saques_restantes(quantidade_saques_restantes)
+        set_saldo(saldo)
         return True
 
 
@@ -74,7 +99,7 @@ Parâmetros:
 Retorna:
 - N/A
 """
-def mostrar_extrato():
+def mostrar_extrato(saldo):
 # Verifica se o extrato está vazio.
     if not extrato:
         print(
@@ -86,8 +111,8 @@ def mostrar_extrato():
         print(
 f'''=-=-=-=-=-=-=-=-=-=Extrato-=-=-==-=-=-=-=-=-=
     Seu saldo atual é: R${saldo:.2f}
-    OPERAÇÃO   |    VALOR
-    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾''')
+    OPERAÇÃO   |    VALOR       | Horário
+    ‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾''')
         # Muda a quantidade de espaços dependendo da quantidade de char de uma palavra, para o print ficar alinhado
         for item in extrato:
             if(item['Tipo de operação'] == 'Saque'):
@@ -96,7 +121,7 @@ f'''=-=-=-=-=-=-=-=-=-=Extrato-=-=-==-=-=-=-=-=-=
                 quantidade_espacos_print = 3
             else:
                 quantidade_espacos_print = 4
-            print(f"    {item['Tipo de operação']}{quantidade_espacos_print*' '}|    R${item['Valor']:.2f}")
+            print(f"    {item['Tipo de operação']}{quantidade_espacos_print*' '}|    R${item['Valor']:.2f}    | Horário:{item['Horário']}")
         input('Aperte "enter" para continuar. ')
 
 
@@ -131,7 +156,7 @@ Opção: '''))
                     while status_deposito == False:
                         try:
                             valor_deposito = float(input("Informe o valor para depósito: "))
-                            status_deposito = depositar_valor(valor_deposito)
+                            status_deposito = depositar_valor(saldo, valor_deposito)
                         except:
                             print('Forneça um valor válido.')
                             continue
@@ -146,13 +171,13 @@ Opção: '''))
                             try:
                                 print(f'Você possuí ({quantidade_saques_restantes}/{LIMITE_QUANTIDADE_SAQUE_DIARIO}) saques restantes!')
                                 valor_saque = float(input("Informe o valor de saque: "))
-                                status_saque = sacar_valor(valor_saque)
+                                status_saque = sacar_valor(saldo=saldo,valor=valor_saque,quantidade_saques_restantes=quantidade_saques_restantes)
 
                             except:
-                                print('Forneça um valor válido.')
-                                continue
+                                print('Erro: Operação de saque cancelada.')
+                                break
                 case 3:
-                    mostrar_extrato()
+                    mostrar_extrato(saldo)
                     continue
                 case _:
                     print('Opção inválida.')
